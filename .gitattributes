@@ -28,4 +28,5 @@ unica/mods/rezetprop/system/bin/rezetprop binary
 platform/exynos9820/patches/vendor/vendor/** binary
 
 # Device-specific prebuilt blobs
+target/a53x/patches/vendor/vendor/*/** binary
 target/r8s/patches/vendor/vendor/** binary
