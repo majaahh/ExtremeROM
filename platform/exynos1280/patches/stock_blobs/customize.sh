@@ -26,9 +26,39 @@ ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib64/libremotedisplay.so" 0
 ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib64/libremotedisplay_wfd.so" 0 0 644 "u:object_r:system_lib_file:s0"
 ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib64/libremotedisplayservice.so" 0 0 644 "u:object_r:system_lib_file:s0"
 
-echo "Replacing Hotword"
-DELETE_FROM_WORK_DIR "product" "priv-app/HotwordEnrollmentOKGoogleEx4CORTEXM55"
-DELETE_FROM_WORK_DIR "product" "priv-app/HotwordEnrollmentXGoogleEx4CORTEXM55"
-ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "product" "priv-app/HotwordEnrollmentOKGoogleEx4CORTEXM4/HotwordEnrollmentOKGoogleEx4CORTEXM4.apk" 0 0 644 "u:object_r:system_file:s0"
-ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "product" "priv-app/HotwordEnrollmentXGoogleEx4CORTEXM4/HotwordEnrollmentXGoogleEx4CORTEXM4.apk" 0 0 644 "u:object_r:system_file:s0"
+if [ "$TARGET_CODENAME" != "a25x" ]; then
+    echo "Replacing Hotword"
+    DELETE_FROM_WORK_DIR "product" "priv-app/HotwordEnrollmentOKGoogleEx4CORTEXM55"
+    DELETE_FROM_WORK_DIR "product" "priv-app/HotwordEnrollmentXGoogleEx4CORTEXM55"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "product" "priv-app/HotwordEnrollmentOKGoogleEx4CORTEXM4/HotwordEnrollmentOKGoogleEx4CORTEXM4.apk" 0 0 644 "u:object_r:system_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "product" "priv-app/HotwordEnrollmentXGoogleEx4CORTEXM4/HotwordEnrollmentXGoogleEx4CORTEXM4.apk" 0 0 644 "u:object_r:system_file:s0"
+fi
+
+if [ "$TARGET_CODENAME" = "a25x" ]; then
+    echo "Fixing NFC"
+    DELETE_FROM_WORK_DIR "system" "system/lib64/libnfc-nci_flags.so"
+    DELETE_FROM_WORK_DIR "system" "system/lib64/libnfc_sec_jni.so"
+    DELETE_FROM_WORK_DIR "system" "system/lib64/libstatslog_nfc.so"
+    DELETE_FROM_WORK_DIR "system" "system/lib64/libnfc-sec.so"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/etc/libnfc-nci.conf" 0 0 644 "u:object_r:system_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib64/libnfc_st_jni.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib64/libnfc-nci-st.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/priv-app/NfcNci/NfcNci.apk" 0 0 644 "u:object_r:system_file:s0"
+
+    echo "Replacing vault shitter"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib/libvkjni.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib/libvkmanager.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib/vendor.samsung.hardware.security.vaultkeeper-V1-ndk.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib64/libvkjni.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib64/libvkmanager.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib64/vendor.samsung.hardware.security.vaultkeeper-V1-ndk.so" 0 0 644 "u:object_r:system_lib_file:s0"
+
+    echo "Replacing ENGMODE JNI"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib/lib.engmode.samsung.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib/lib.engmodejni.samsung.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib/vendor.samsung.hardware.security.engmode-V1-ndk.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib64/lib.engmode.samsung.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib64/lib.engmodejni.samsung.so" 0 0 644 "u:object_r:system_lib_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/lib64/vendor.samsung.hardware.security.engmode-V1-ndk.so" 0 0 644 "u:object_r:system_lib_file:s0"
+fi
 

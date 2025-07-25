@@ -27,7 +27,6 @@ system/lib64/libPortraitDistortionCorrectionCali.arcsoft.so
 system/lib64/libface_landmark.arcsoft.so
 system/lib64/libFacialStickerEngine.arcsoft.so
 system/lib64/libveengine.arcsoft.so
-system/lib64/libimage_enhancement.arcsoft.so
 system/lib64/liblow_light_hdr.arcsoft.so
 system/lib64/libobjectcapture_jni.arcsoft.so
 system/lib64/libobjectcapture.arcsoft.so
@@ -50,6 +49,12 @@ system/lib64/libHprFace_GAE_api.camera.samsung.so
 system/lib64/libFace_Landmark_API.camera.samsung.so
 system/lib64/libImageTagger.camera.samsung.so
 "
+
+if [ "$TARGET_CODENAME" = "a53x" ]; then
+  BLOBS_LIST+="
+system/lib64/libimage_enhancement.arcsoft.so
+  "
+fi
 
 for blob in $BLOBS_LIST
 do
