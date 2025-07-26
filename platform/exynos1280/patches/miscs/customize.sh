@@ -1,6 +1,6 @@
-echo "Disabling encryption"
-LINE=$(sed -n "/^\/dev\/block\/by-name\/userdata/=" "$WORK_DIR/vendor/etc/fstab.s5e8825")
-sed -i "${LINE}s/,fileencryption=aes-256-xts:aes-256-cts:v2//g" "$WORK_DIR/vendor/etc/fstab.s5e8825"
+# echo "Disabling encryption"
+# LINE=$(sed -n "/^\/dev\/block\/by-name\/userdata/=" "$WORK_DIR/vendor/etc/fstab.s5e8825")
+# sed -i "${LINE}s/,fileencryption=aes-256-xts:aes-256-cts:v2//g" "$WORK_DIR/vendor/etc/fstab.s5e8825"
 
 if [ "$TARGET_CODENAME" != "a25x" ]; then
   echo "Adding r11s btservices apex"
