@@ -574,7 +574,9 @@ while read -r i; do
     [ -f "$WORK_DIR/$PARTITION.img" ] && rm -f "$WORK_DIR/$PARTITION.img"
 
     echo "Building $PARTITION.img"
-    if [[ "$PARTITION" == "system" || "$PARTITION" == "prism" || "$PARTITION" == "optics" ]]; then
+    if [[ "$PARTITION" == "system" ]]; then
+        FILESYSTEM_TYPE="$TARGET_OS_FILE_SYSTEM"
+    elif [[ "$PARTITION" == "prism" || "$PARTITION" == "optics" ]]; then
         FILESYSTEM_TYPE="ext4"
     else
         FILESYSTEM_TYPE="$TARGET_OS_FILE_SYSTEM"
