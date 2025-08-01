@@ -83,7 +83,6 @@ _GET_PROP_FILES_PATH()
                     "$WORK_DIR/system_dlkm/etc/build.prop"
                     "$WORK_DIR/system/system/system_dlkm/etc/build.prop"
                 )
-                ;;
         esac
     else
         # https://android.googlesource.com/platform/system/core/+/refs/tags/android-15.0.0_r1/init/property_service.cpp#1214
@@ -530,7 +529,7 @@ IS_VALID_PARTITION_NAME()
     # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/common.py#131
     [[ "$PARTITION" == "system" ]] || [[ "$PARTITION" == "vendor" ]] || [[ "$PARTITION" == "product" ]] || \
         [[ "$PARTITION" == "system_ext" ]] || [[ "$PARTITION" == "odm" ]] || [[ "$PARTITION" == "vendor_dlkm" ]] || \
-        [[ "$PARTITION" == "odm_dlkm" ]] || [[ "$PARTITION" == "system_dlkm" ]]
+        [[ "$PARTITION" == "odm_dlkm" ]] || [[ "$PARTITION" == "system_dlkm" ]] || [[ "$PARTITION" == "optics" ]] || [[ "$PARTITION" == "prism" ]]
 }
 
 # SET_METADATA <partition> <file/dir> <user> <group> <mode> <label>
