@@ -19,12 +19,9 @@
 # [
 source "$SRC_DIR/scripts/utils/build_utils.sh" || exit 1
 
-SOURCE_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$SOURCE_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$SOURCE_FIRMWARE")"
-TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
-
-SOURCE_FINGERPRINT="$(GET_PROP "$FW_DIR/$SOURCE_FIRMWARE_PATH/system/system/build.prop" "ro.system.build.fingerprint")"
+SOURCE_FINGERPRINT="$(GET_PROP "$WORK_DIR/system/system/build.prop" "ro.system.build.fingerprint")"
 SOURCE_FINGERPRINT="${SOURCE_FINGERPRINT//$(GET_PROP "$FW_DIR/$SOURCE_FIRMWARE_PATH/system/system/build.prop" "ro.build.product")/$(GET_PROP "$FW_DIR/$SOURCE_FIRMWARE_PATH/vendor/build.prop" "ro.product.vendor.device")}"
-TARGET_FINGERPRINT="$(GET_PROP "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/build.prop" "ro.system.build.fingerprint")"
+TARGET_FINGERPRINT="$(GET_PROP "$WORK_DIR/vendor/build.prop" "ro.vendor.build.fingerprint")"
 TARGET_FINGERPRINT="${TARGET_FINGERPRINT//$(GET_PROP "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/build.prop" "ro.build.product")/$(GET_PROP "$FW_DIR/$TARGET_FIRMWARE_PATH/vendor/build.prop" "ro.product.vendor.device")}"
 
 TMP_DIR="$OUT_DIR/zip"
@@ -307,14 +304,6 @@ GENERATE_UPDATER_SCRIPT()
         PRINT_HEADER
 
         if [ "$TARGET_SUPER_PARTITION_SIZE" -ne 0 ]; then
-            echo -e "\n# --- Start patching dynamic partitions ---\n\n"
-            echo -e "# Update dynamic partition metadata\n"
-            echo -n 'assert(update_dynamic_partitions(package_extract_file("dynamic_partitions_op_list")'
-            if $HAS_SUPER_EMPTY; then
-                echo -n ', package_extract_file("unsparse_super_empty.img")'
-            fi
-            echo    '));'
-        if [ "$TARGET_SUPER_PARTITION_SIZE" -ne 0 ]; then
             # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/common.py#4007
             echo -e "\n# --- Start patching dynamic partitions ---\n\n"
             echo -e "# Update dynamic partition metadata\n"
@@ -324,8 +313,8 @@ GENERATE_UPDATER_SCRIPT()
                 # https://github.com/LineageOS/android_bootable_deprecated-ota/commit/e97be4333bd3824b8561c9637e9e6de28bc29da0
                 echo -n ', package_extract_file("unsparse_super_empty.img")'
             fi
+            echo    '));'
         fi
-        echo    'show_progress(1, 200);'
         if $HAS_SYSTEM; then
             echo -e "\n# Patch partition system\n"
             echo    'ui_print("Patching system image unconditionally...");'
@@ -607,11 +596,6 @@ cp -a "$SRC_DIR/prebuilts/bootable/deprecated-ota/updater" "$TMP_DIR/META-INF/co
 mkdir -p "$TMP_DIR/scripts"
 cp -a "$SRC_DIR/prebuilts/extras/cleanup.sh" "$TMP_DIR/scripts/cleanup.sh"
 
-if [ -f "$WORK_DIR/up_param.bin" ]; then
-    echo "Copying up_param.bin"
-    cp -fa "$WORK_DIR/up_param.bin" "$TMP_DIR/up_param.bin"
-fi
-
 LOG_STEP_IN "- Building OS partitions"
 while IFS= read -r f; do
     PARTITION=$(basename "$f")
@@ -626,6 +610,7 @@ while IFS= read -r f; do
     "$SRC_DIR/scripts/build_fs_image.sh" "$FILESYSTEM_TYPE" \
         -o "$TMP_DIR/$PARTITION.img" -m -S \
         "$WORK_DIR/$PARTITION" "$WORK_DIR/configs/file_context-$PARTITION" "$WORK_DIR/configs/fs_config-$PARTITION" || exit 1
+    LOG_STEP_OUT
 done < <(find "$WORK_DIR" -maxdepth 1 -type d)
 LOG_STEP_OUT
 
@@ -645,22 +630,25 @@ while IFS= read -r f; do
     EVAL "img2sdat -o \"$TMP_DIR\" -B \"$TMP_DIR/$PARTITION.map\" \"$f\"" || exit 1
     rm -f "$f" "$TMP_DIR/$PARTITION.map"
 
-    LOG "- Compressing $PARTITION.new.dat"
-    # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/common.py#3585
-    EVAL "brotli --quality=6 --output=\"$TMP_DIR/$PARTITION.new.dat.br\" \"$TMP_DIR/$PARTITION.new.dat\"" || exit 1
-    rm -f "$TMP_DIR/$PARTITION.new.dat"
+    if ! $DEBUG; then
+        LOG "- Compressing $PARTITION.new.dat"
+        # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/common.py#3585
+        EVAL "brotli --quality=6 --output=\"$TMP_DIR/$PARTITION.new.dat.br\" \"$TMP_DIR/$PARTITION.new.dat\"" || exit 1
+        rm -f "$TMP_DIR/$PARTITION.new.dat"
+    fi
 done < <(find "$TMP_DIR" -maxdepth 1 -type f -name "*.img")
 
 if [ -d "$WORK_DIR/kernel" ]; then
     while IFS= read -r f; do
         IMG="$(basename "$f")"
-
-        LOG_STEP_IN "- Copying $IMG"
-
-        cp -a "$WORK_DIR/kernel/$IMG" "$TMP_DIR/$IMG"
-
-        LOG_STEP_OUT
+        LOG "- Copying $IMG"
+        cp -fa "$WORK_DIR/kernel/$IMG" "$TMP_DIR/$IMG"
     done < <(find "$WORK_DIR/kernel" -maxdepth 1 -type f -name "*.img")
+fi
+
+if [ -f "$WORK_DIR/up_param.bin" ]; then
+    LOG "- Copying up_param.bin"
+    cp -fa "$WORK_DIR/up_param.bin" "$TMP_DIR/up_param.bin"
 fi
 
 LOG "- Generating updater-script"
@@ -679,11 +667,9 @@ while IFS= read -r f; do
     # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/common.py#3609
     # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/ota_utils.py#184
     # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/ota_utils.py#186
-    if [[ "$f" == *".new.dat.br" ]] || [[ "$f" == *".patch.dat" ]] || [[ "$f" == *"com/android/metadata"* ]]; then
-        EVAL "cd \"$TMP_DIR\" && zip -r -X -Z store \"$TMP_DIR/rom.zip\" \"${f//$TMP_DIR\//}\"" || exit 1
-    else
-        EVAL "cd \"$TMP_DIR\" && zip -r -X \"$TMP_DIR/rom.zip\" \"${f//$TMP_DIR\//}\"" || exit 1
-    fi
+    EVAL "cd \"$TMP_DIR\" && zip -r -X -Z store \"$TMP_DIR/rom.zip\" \"${f//$TMP_DIR\//}\"" || exit 1
 done < <(find "$TMP_DIR" -type f ! -name "*.zip")
+
+mv -f "$TMP_DIR/rom.zip" "$OUT_DIR/$FILE_NAME.zip"
 
 exit 0
