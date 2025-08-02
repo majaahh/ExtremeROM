@@ -25,5 +25,5 @@ if [[ "$TARGET_NFC_CHIP_VENDOR" == "NXP" && "$SOURCE_NFC_CHIP_VENDOR" == "SLSI" 
     ln -sf "/system/lib64/libnfc_nxpsn_jni.so" "$WORK_DIR/system/system/priv-app/NfcNci/lib/arm64/libnfc_nxpsn_jni.so"
     SET_METADATA "system" "system/priv-app/NfcNci/lib/arm64/libnfc_nxpsn_jni.so" 0 0 644 "u:object_r:system_file:s0"
 else
-    echo "NFC chip is not NXP, ignoring..."
+    LOG "- NFC chip is not NXP. Ignoring."
 fi
