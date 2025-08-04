@@ -129,7 +129,7 @@ if $BUILD_ROM; then
         LOG_STEP_OUT
     fi
 
-    if [ -d "$SRC_DIR/target/$TARGET_CODENAME/patches" ]; then
+    if [ -d "$SRC_DIR/platform/$TARGET_PLATFORM/patches" ]; then
         LOG_STEP_IN true "Applying platform patches"
         "$SRC_DIR/scripts/internal/apply_modules.sh" "$SRC_DIR/platform/$TARGET_PLATFORM/patches" || exit 1
         LOG_STEP_OUT
