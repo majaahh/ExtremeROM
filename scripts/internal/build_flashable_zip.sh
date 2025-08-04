@@ -240,8 +240,7 @@ GENERATE_OTA_METADATA()
 GENERATE_UPDATER_SCRIPT()
 {
     local SCRIPT_FILE="$TMP_DIR/META-INF/com/google/android/updater-script"
-    local BROTLI_EXTENSION
-    $DEBUG || BROTLI_EXTENSION=".br"
+    local BROTLI_EXTENSION=".br"
 
     local PARTITION_COUNT=0
     local HAS_UP_PARAM=false
@@ -630,12 +629,10 @@ while IFS= read -r f; do
     EVAL "img2sdat -o \"$TMP_DIR\" -B \"$TMP_DIR/$PARTITION.map\" \"$f\"" || exit 1
     rm -f "$f" "$TMP_DIR/$PARTITION.map"
 
-    if ! $DEBUG; then
-        LOG "- Compressing $PARTITION.new.dat"
-        # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/common.py#3585
-        EVAL "brotli --quality=6 --output=\"$TMP_DIR/$PARTITION.new.dat.br\" \"$TMP_DIR/$PARTITION.new.dat\"" || exit 1
-        rm -f "$TMP_DIR/$PARTITION.new.dat"
-    fi
+    LOG "- Compressing $PARTITION.new.dat"
+    # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/common.py#3585
+    EVAL "brotli --quality=6 --output=\"$TMP_DIR/$PARTITION.new.dat.br\" \"$TMP_DIR/$PARTITION.new.dat\"" || exit 1
+    rm -f "$TMP_DIR/$PARTITION.new.dat"
 done < <(find "$TMP_DIR" -maxdepth 1 -type f -name "*.img")
 
 if [ -d "$WORK_DIR/kernel" ]; then
