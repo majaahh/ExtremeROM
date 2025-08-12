@@ -127,6 +127,7 @@ Original UN1CA credits:
 - *All the UN1CA project contributors and testers ❤️*
 
 # Kernel sources and device trees
+- 1280 Kernel Source Code (Maintainer: @Flopster101): https://github.com/FlopKernel-Series/flop_s5e8825_kernel/
 - 9820 Kernel Source Code (Maintainer: @ExtremeXT): https://github.com/ExtremeXT/M62-backport
 - 9820 Device Tree Code (Maintainer: @ExtremeXT): https://github.com/ExtremeXT/android_device_samsung_exynos9820
 - 990 Kernel Source Code (Maintainer: @ExtremeXT): https://github.com/ExtremeXT/990_upstream_v2
