@@ -1,6 +1,12 @@
 List of maintainers
 -------------------
 
+Exynos 1280
+M: Ksawlii (@ksawlii)
+S: Maintained
+F: platform/exynos1280/*
+F: target/a53x/*
+
 Exynos 9820
 M: ExtremeXT (@ExtremeXT)
 S: Maintained
